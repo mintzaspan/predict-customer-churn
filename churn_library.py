@@ -41,6 +41,18 @@ def perform_eda(df):
     output:
             None
     '''
+    # df shape
+    df_shape = df.shape
+    logging.info(f"Dataframe has {df_shape[0]} rows and {df_shape[1]} columns.")
+
+    # null counts
+    missing_values = df.isnull().sum()
+    high_missing_thresh = 0.3
+    high_missing_rate = missing_values[missing_values>len(df)*high_missing_thresh]
+    if len(high_missing_rate) > 0:
+        logging.info(f'Columns with more than {high_missing_thresh:.0%} missing values: {high_missing_rate.index.tolist()}')
+    else:
+        logging.info(f'No columns with more than {high_missing_thresh:.0%} of values missing.')
     pass
 
 
@@ -126,4 +138,36 @@ def train_models(X_train, X_test, y_train, y_test):
 
 
 if __name__ == "__main__":
-    import_data('data/bank_data.csv')
+    # import data
+    df = import_data('data/bank_data.csv')
+
+    cat_columns = [
+        'Gender',
+        'Education_Level',
+        'Marital_Status',
+        'Income_Category',
+        'Card_Category'
+    ]
+
+    quant_columns = [
+        'Customer_Age',
+        'Dependent_count'
+        'Months_on_book',
+        'Total_Relationship_Count',
+        'Months_Inactive_12_mon',
+        'Contacts_Count_12_mon',
+        'Credit_Limit',
+        'Total_Revolving_Bal',
+        'Avg_Open_To_Buy',
+        'Total_Amt_Chng_Q4_Q1',
+        'Total_Trans_Amt',
+        'Total_Trans_Ct',
+        'Total_Ct_Chng_Q4_Q1',
+        'Avg_Utilization_Ratio'
+        ]
+
+    # define churn variable
+    df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
+    logging.info('Churn variable created')
+
+    perform_eda(df)
