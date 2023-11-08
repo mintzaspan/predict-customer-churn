@@ -5,6 +5,7 @@
 import os
 import pandas as pd
 import logging
+import matplotlib.pyplot as plt
 
 logging.basicConfig(
     filename='./logs/churn_library.log',
@@ -32,7 +33,7 @@ def import_data(pth):
         logging.error('File was not found in specified directory')
 
 
-def perform_eda(df):
+def perform_eda(df, num_cols, cat_cols, target_col):
     '''
     perform eda on df and save figures to images folder
     input:
@@ -53,6 +54,15 @@ def perform_eda(df):
         logging.info(f'Columns with more than {high_missing_thresh:.0%} missing values: {high_missing_rate.index.tolist()}')
     else:
         logging.info(f'No columns with more than {high_missing_thresh:.0%} of values missing.')
+
+    for i in quant_columns:
+        plt.hist(x=df[i])
+        plt.title(i)
+        plt.savefig(f'images/eda/{i}_histogram.png')
+        plt.clf()
+
+
+    
     pass
 
 
@@ -151,7 +161,7 @@ if __name__ == "__main__":
 
     quant_columns = [
         'Customer_Age',
-        'Dependent_count'
+        'Dependent_count',
         'Months_on_book',
         'Total_Relationship_Count',
         'Months_Inactive_12_mon',
@@ -170,4 +180,5 @@ if __name__ == "__main__":
     df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
     logging.info('Churn variable created')
 
-    perform_eda(df)
+    # eda
+    perform_eda(df, num_cols=quant_columns, cat_cols=cat_columns, target_col='Churn')
