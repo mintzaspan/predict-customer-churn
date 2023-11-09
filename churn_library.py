@@ -6,6 +6,8 @@ import os
 import pandas as pd
 import logging
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 logging.basicConfig(
     filename='./logs/churn_library.log',
@@ -42,6 +44,7 @@ def perform_eda(df, num_cols, cat_cols, target_col):
     output:
             None
     '''
+    logging.info('Starting exploratory data analysis')
     # df shape
     df_shape = df.shape
     logging.info(f"Dataframe has {df_shape[0]} rows and {df_shape[1]} columns.")
@@ -55,11 +58,51 @@ def perform_eda(df, num_cols, cat_cols, target_col):
     else:
         logging.info(f'No columns with more than {high_missing_thresh:.0%} of values missing.')
 
+
+    # produce univariate plots
+    logging.info('Producing histograms of numerical variables')
     for i in quant_columns:
         plt.hist(x=df[i])
         plt.title(i)
         plt.savefig(f'images/eda/{i}_histogram.png')
         plt.clf()
+    logging.info(f'Histograms produced and saved in images/eda/ folder')
+    
+    logging.info('Producing frequency plots of categorical variables')
+    for i in cat_cols:
+        freq_series = df[i].value_counts(normalize=True)
+        plt.bar(x=freq_series.index, 
+                height=freq_series)
+        plt.title(i)
+        plt.xticks(rotation=30)
+        plt.savefig(f'images/eda/{i}_frequency_plot.png')
+        plt.clf()
+    logging.info(f'Frequeny plots produced and saved in images/eda/ folder')
+
+    
+    # bivariate plots
+    logging.info('Map continuous variables to target variable')
+    for i in quant_columns:
+        box_plot = sns.boxplot(data=df, x=target_col, y=i)
+        fig = box_plot.get_figure()
+        plt.title(i)
+        fig.savefig(f'images/eda/{i}_boxplot.png')
+        plt.clf()
+    logging.info(f'Boxplots produced and saved in images/eda/ folder')
+
+
+    logging.info('Map categorical variables to target variable')
+    for i in cat_columns:
+        plot_series = df.groupby(i)[target_col].mean()
+        plt.bar(x=plot_series.index, height=plot_series)
+        plt.title(i)
+        plt.xlabel(i)
+        plt.ylabel(f'Mean {target_col}')
+        fig.savefig(f'images/eda/{i}_response_plot.png')
+        plt.clf()
+    logging.info(f'Target variable response plots produced and saved in images/eda/ folder')
+
+
 
 
     
