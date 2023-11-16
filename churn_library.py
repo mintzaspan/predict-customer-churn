@@ -64,7 +64,7 @@ def perform_eda(df, num_cols, cat_cols, target_col):
     for i in quant_columns:
         plt.hist(x=df[i])
         plt.title(i)
-        plt.savefig(f'images/eda/{i}_histogram.png')
+        plt.savefig(f'images/eda/{i}_histogram.png', bbox_inches="tight")
         plt.clf()
     logging.info(f'Histograms produced and saved in images/eda/ folder')
     
@@ -75,7 +75,7 @@ def perform_eda(df, num_cols, cat_cols, target_col):
                 height=freq_series)
         plt.title(i)
         plt.xticks(rotation=30)
-        plt.savefig(f'images/eda/{i}_frequency_plot.png')
+        plt.savefig(f'images/eda/{i}_frequency_plot.png', bbox_inches="tight")
         plt.clf()
     logging.info(f'Frequeny plots produced and saved in images/eda/ folder')
 
@@ -86,7 +86,7 @@ def perform_eda(df, num_cols, cat_cols, target_col):
         box_plot = sns.boxplot(data=df, x=target_col, y=i)
         fig = box_plot.get_figure()
         plt.title(i)
-        fig.savefig(f'images/eda/{i}_boxplot.png')
+        fig.savefig(f'images/eda/{i}_boxplot.png', bbox_inches="tight")
         plt.clf()
     logging.info(f'Boxplots produced and saved in images/eda/ folder')
 
@@ -98,9 +98,14 @@ def perform_eda(df, num_cols, cat_cols, target_col):
         plt.title(i)
         plt.xlabel(i)
         plt.ylabel(f'Mean {target_col}')
-        fig.savefig(f'images/eda/{i}_response_plot.png')
+        fig.savefig(f'images/eda/{i}_response_plot.png', bbox_inches="tight")
         plt.clf()
     logging.info(f'Target variable response plots produced and saved in images/eda/ folder')
+
+    logging.info('Produce correlation heatmap')
+    sns.heatmap(df[num_cols + ['Churn']].corr(), annot=False, cmap='Dark2_r', linewidths = 2)
+    plt.savefig("images/eda/Correlation_heatmap.png", bbox_inches="tight")
+    logging.info(f'Correlation heatmap produced and saved in images/eda/ folder')
 
 
 
