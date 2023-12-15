@@ -108,12 +108,6 @@ def perform_eda(df, num_cols, cat_cols, target_col):
     logging.info(f'Correlation heatmap produced and saved in images/eda/ folder')
 
 
-
-
-    
-    pass
-
-
 def encoder_helper(df, category_lst, response):
     '''
     helper function to turn each categorical column into a new column with
