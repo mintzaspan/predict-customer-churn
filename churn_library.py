@@ -11,6 +11,7 @@ import logging
 import yaml
 import pandas as pd
 import plotly.express as px
+from sklearn.model_selection import train_test_split
 
 
 def setup_logging(script_pth):
@@ -89,6 +90,28 @@ def perform_eda(df, num_cols, cat_cols, target_col):
         fig_bi.write_image(f'{eda_dir}{i}_bv_plot.png')
 
 
+def split_frame(df, response, test_size):
+    """Splits pandas DataFrame to train and test datasets
+
+    Args:
+        df: pandas DataFrame
+        response: string of response column name
+
+    Returns:
+        X_train: X training data
+        X_test: X testing data
+        y_train: y training data
+        y_test: y testing data
+    """
+
+    y = df[response]
+    X = df.drop(columns=[response])
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, stratify=y, random_state=42)
+    return (X_train, X_test, y_train, y_test)
+
+
 if __name__ == "__main__":
 
     # set up logging
@@ -125,3 +148,9 @@ if __name__ == "__main__":
         cat_cols=config["categorical_columns"],
         target_col=config["response"])
     logging.info('Univariate and bivariate analysis plots saved in EDA folder')
+
+    # split to train test
+    X_train, X_test, y_train, y_test = split_frame(
+        df=df, response=config["response"], test_size=config["feature_engineering"]["test_size"])
+    logging.info(
+        "Dataframe was split to X_train, X_test, y_train, y_test frames")

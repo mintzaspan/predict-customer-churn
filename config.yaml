@@ -27,3 +27,5 @@ numerical_columns:
 drop_columns:
   - "Unnamed: 0"
   - "Attrition_Flag"
+feature_engineering:
+  test_size: 0.2
