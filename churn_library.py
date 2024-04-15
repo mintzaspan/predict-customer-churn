@@ -9,6 +9,7 @@ Date: March 2024
 import os
 import logging
 import yaml
+import pandas as pd
 
 
 def setup_logging(script_pth):
@@ -37,6 +38,19 @@ def setup_logging(script_pth):
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
+def import_data(pth):
+    """Returns pandas dataframe for the CSV found at pth
+
+    Args:
+        pth: a path to the csv
+
+    Returns:
+        df: pandas dataframe
+    """
+    data = pd.read_csv(pth)
+    return (data)
+
+
 if __name__ == "__main__":
 
     # set up logging
@@ -47,3 +61,11 @@ if __name__ == "__main__":
     with open('config.yaml', 'r') as file:
         config = yaml.safe_load(file)
     logging.info("Training parameters imported")
+
+    # import data
+    try:
+        logging.info('Reading CSV file')
+        df = import_data(config['data'])
+        logging.info('SUCCESS: File read into dataframe')
+    except FileNotFoundError:
+        logging.error('File was not found in specified directory')
