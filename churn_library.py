@@ -1,111 +1,43 @@
-# library doc string
+"""
+Purpose: Build a model to predict customer churn
+Author: Panagiotis Mintzas
+Date: March 2024
+"""
 
 
 # import libraries
 import os
-os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+import logging
 
 
-def import_data(pth):
-    '''
-    returns dataframe for the csv found at pth
+def setup_logging(script_pth):
+    """Sets up logging for the current module named after the module
 
-    input:
-            pth: a path to the csv
-    output:
-            df: pandas dataframe
-    '''
-    pass
+    Args:
+        script_pth: path to a python module
 
+    Returns:
+        None
+    """
 
-def perform_eda(df):
-    '''
-    perform eda on df and save figures to images folder
-    input:
-            df: pandas dataframe
+    log_dir = 'logs/'
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir, exist_ok=True)
 
-    output:
-            None
-    '''
-    pass
+    script_path = script_pth
+    script_name = os.path.basename(script_path).split('/')[-1].split('.')[0]
+    log_name = ''.join([script_name, '.log'])
+    log_file = os.path.join(log_dir, log_name)
 
-
-def encoder_helper(df, category_lst, response):
-    '''
-    helper function to turn each categorical column into a new column with
-    propotion of churn for each category - associated with cell 15 from the notebook
-
-    input:
-            df: pandas dataframe
-            category_lst: list of columns that contain categorical features
-            response: string of response name [optional argument that could be used for naming variables or index y column]
-
-    output:
-            df: pandas dataframe with new columns for
-    '''
-    pass
+    logging.basicConfig(
+        filename=log_file,
+        level=logging.INFO,
+        filemode='w',
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
-def perform_feature_engineering(df, response):
-    '''
-    input:
-              df: pandas dataframe
-              response: string of response name [optional argument that could be used for naming variables or index y column]
+if __name__ == "__main__":
 
-    output:
-              X_train: X training data
-              X_test: X testing data
-              y_train: y training data
-              y_test: y testing data
-    '''
-
-
-def classification_report_image(y_train,
-                                y_test,
-                                y_train_preds_lr,
-                                y_train_preds_rf,
-                                y_test_preds_lr,
-                                y_test_preds_rf):
-    '''
-    produces classification report for training and testing results and stores report as image
-    in images folder
-    input:
-            y_train: training response values
-            y_test:  test response values
-            y_train_preds_lr: training predictions from logistic regression
-            y_train_preds_rf: training predictions from random forest
-            y_test_preds_lr: test predictions from logistic regression
-            y_test_preds_rf: test predictions from random forest
-
-    output:
-             None
-    '''
-    pass
-
-
-def feature_importance_plot(model, X_data, output_pth):
-    '''
-    creates and stores the feature importances in pth
-    input:
-            model: model object containing feature_importances_
-            X_data: pandas dataframe of X values
-            output_pth: path to store the figure
-
-    output:
-             None
-    '''
-    pass
-
-
-def train_models(X_train, X_test, y_train, y_test):
-    '''
-    train, store model results: images + scores, and store models
-    input:
-              X_train: X training data
-              X_test: X testing data
-              y_train: y training data
-              y_test: y testing data
-    output:
-              None
-    '''
-    pass
+    # set up logging
+    setup_logging('churn_library.py')
+    logging.info("Log file created")
