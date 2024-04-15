@@ -69,3 +69,12 @@ if __name__ == "__main__":
         logging.info('SUCCESS: File read into dataframe')
     except FileNotFoundError:
         logging.error('File was not found in specified directory')
+
+    # define churn variable
+    df['Churn'] = df['Attrition_Flag'].apply(
+        lambda val: 0 if val == "Existing Customer" else 1)
+    logging.info('Churn variable created')
+
+    # drop columns
+    df.drop(columns=config['drop_columns'], inplace=True)
+    logging.info(f"Dropped obsolete columns dropped: {config['drop_columns']}")
