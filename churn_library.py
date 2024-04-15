@@ -10,6 +10,7 @@ import os
 import logging
 import yaml
 import pandas as pd
+import plotly.express as px
 
 
 def setup_logging(script_pth):
@@ -51,6 +52,43 @@ def import_data(pth):
     return (data)
 
 
+def perform_eda(df, num_cols, cat_cols, target_col):
+    """Performs EDA on dataframe and save figures to images folder.
+
+    Args:
+        df: pandas dataframe
+        num_cols: numerical columns list
+        cat_cols: categorical columns list
+        target_col: target column name
+
+    Returns:
+        None
+    """
+    eda_dir = 'images/eda/'
+    if not os.path.exists(eda_dir):
+        os.makedirs(eda_dir, exist_ok=True)
+
+    # produce univariate plots
+    for i in num_cols:
+        fig_num = px.histogram(data_frame=df, x=i, title=i)
+        fig_num.write_image(f'{eda_dir}{i}_histplot.png')
+
+    for i in cat_cols:
+        fig_cat = px.histogram(data_frame=df, x=i, color=i, title=i)
+        fig_cat.write_image(f'{eda_dir}{i}_freqplot.png')
+
+    # produce bivariate plots
+    for i in cat_cols:
+        avg_target_by_cat = df.groupby(i)[target_col].mean().reset_index()
+        fig_bi = px.bar(
+            data_frame=avg_target_by_cat,
+            x=i,
+            y=target_col,
+            color=i,
+            title=f'Mean {target_col} by {i}')
+        fig_bi.write_image(f'{eda_dir}{i}_bv_plot.png')
+
+
 if __name__ == "__main__":
 
     # set up logging
@@ -78,3 +116,12 @@ if __name__ == "__main__":
     # drop columns
     df.drop(columns=config['drop_columns'], inplace=True)
     logging.info(f"Dropped obsolete columns dropped: {config['drop_columns']}")
+
+    # eda
+    logging.info('Starting exploratory data analysis')
+    perform_eda(
+        df=df,
+        num_cols=config["numerical_columns"],
+        cat_cols=config["categorical_columns"],
+        target_col=config["response"])
+    logging.info('Univariate and bivariate analysis plots saved in EDA folder')

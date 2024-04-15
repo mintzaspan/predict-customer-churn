@@ -99,3 +99,5 @@ dependencies:
   - xz=5.2.6
   - yaml=0.2.5
   - zstd=1.5.5
+  - pip:
+      - kaleido==0.2.1
