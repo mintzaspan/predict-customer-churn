@@ -8,6 +8,7 @@ Date: March 2024
 # import libraries
 import os
 import logging
+import yaml
 
 
 def setup_logging(script_pth):
@@ -41,3 +42,8 @@ if __name__ == "__main__":
     # set up logging
     setup_logging('churn_library.py')
     logging.info("Log file created")
+
+    # read config file
+    with open('config.yaml', 'r') as file:
+        config = yaml.safe_load(file)
+    logging.info("Training parameters imported")
