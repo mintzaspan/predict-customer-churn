@@ -11,7 +11,17 @@ import logging
 import yaml
 import pandas as pd
 import plotly.express as px
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import TargetEncoder, StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
+import dill
 
 
 def setup_logging(script_pth):
@@ -112,6 +122,86 @@ def split_frame(df, response, test_size):
     return (X_train, X_test, y_train, y_test)
 
 
+def train_model(
+        algo,
+        X,
+        y,
+        num_cols,
+        cat_cols,
+        params=None
+):
+    """Trains a binary classifier and saves as pickle object
+
+    Args:
+        algo: string for selected binary classification algorithm i.e. "logistic regression" or "random forest"
+        X: predictors
+        y: response
+        num_cols: list of numerical type columns in X
+        cat_cols: list of categorical type columns in X
+
+    Returns:
+        pipe : binary classification pipeline
+    """
+    # create models dir
+    models_dir = 'models/'
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir, exist_ok=True)
+
+    # preprocessor
+    num_features = num_cols
+    numeric_transformer = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler())
+        ]
+    )
+
+    cat_features = cat_cols
+    categorical_transformer = Pipeline(
+        steps=[
+            ("encoder", TargetEncoder()),
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler())
+        ]
+    )
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", numeric_transformer, num_features),
+            ("cat", categorical_transformer, cat_features),
+        ]
+    )
+
+    # algorithms
+    algo_dict = {
+        "logistic_regression": LogisticRegression(random_state=42),
+        "decision_tree": DecisionTreeClassifier(random_state=42),
+        "random_forest": RandomForestClassifier(n_jobs=-1, random_state=42),
+        "gradient_boosting": GradientBoostingClassifier(random_state=42),
+        "xgboost": XGBClassifier(seed=0),
+        "support_vector": SVC(random_state=42)
+    }
+
+    selected_algo = algo_dict[algo]
+
+    # pipeline
+    pipe = Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("classifier", selected_algo)
+        ]
+
+    )
+
+    # fit
+    pipe.fit(X, y)
+
+    # save to local folder
+    with open(f'{models_dir}{algo}.pkl', 'wb') as f:
+        dill.dump(pipe, f)
+
+    return (pipe)
+
+
 if __name__ == "__main__":
 
     # set up logging
@@ -154,3 +244,16 @@ if __name__ == "__main__":
         df=df, response=config["response"], test_size=config["feature_engineering"]["test_size"])
     logging.info(
         "Dataframe was split to X_train, X_test, y_train, y_test frames")
+
+    # train random forest
+    model = train_model(
+        algo="random_forest",
+        X=X_train,
+        y=y_train,
+        num_cols=config["numerical_columns"],
+        cat_cols=config["categorical_columns"]
+    )
+
+    logging.info(
+        "Classifier model trained")
+    logging.info("Model saved in models folder")
