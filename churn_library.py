@@ -185,29 +185,24 @@ def train_model(
 
     # pipeline
     if params is None:
-        pipe = Pipeline(
-            steps=[
-                ("preprocessor", preprocessor),
-                ("classifier", selected_algo)
-            ]
-
-        )
+        clf = selected_algo
     else:
-        print(params)
-        gs = GridSearchCV(
+        clf = GridSearchCV(
             estimator=selected_algo,
             param_grid=params,
-            cv=3
-        )
-
-        pipe = Pipeline(
-            steps=[
-                ("preprocessor", preprocessor),
-                ("classifier", gs)
-            ]
+            cv=3,
+            n_jobs=-1,
+            refit=True
         )
 
     # fit
+    pipe = Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("classifier", clf)
+        ]
+    )
+
     pipe.fit(X, y)
 
     # save to local folder
