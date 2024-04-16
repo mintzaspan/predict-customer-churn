@@ -22,6 +22,7 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
 import dill
+import glob
 
 
 def setup_logging(script_pth):
@@ -210,6 +211,22 @@ def train_model(
         dill.dump(pipe, f)
 
     return (pipe)
+
+
+def load_model(model_pth):
+    """Loads a trained model object (.pkl)
+
+    Args:
+        model_pth : model object path
+
+    Returns:
+        model : trained model as python object
+    """
+
+    with open(model_pth, 'rb') as file:
+        model = dill.load(file)
+
+    return (model)
 
 
 if __name__ == "__main__":
