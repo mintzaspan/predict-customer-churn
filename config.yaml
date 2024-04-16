@@ -29,3 +29,17 @@ drop_columns:
   - "Attrition_Flag"
 feature_engineering:
   test_size: 0.2
+random_forest:
+    param_grid:
+      n_estimators: 
+        - 200
+        - 500
+      max_features:
+        - 19
+        - "sqrt"
+      max_depth: 
+        - 4
+        - 5
+      criterion: 
+        - "gini"
+        - "entropy"

@@ -184,13 +184,28 @@ def train_model(
     selected_algo = algo_dict[algo]
 
     # pipeline
-    pipe = Pipeline(
-        steps=[
-            ("preprocessor", preprocessor),
-            ("classifier", selected_algo)
-        ]
+    if params is None:
+        pipe = Pipeline(
+            steps=[
+                ("preprocessor", preprocessor),
+                ("classifier", selected_algo)
+            ]
 
-    )
+        )
+    else:
+        print(params)
+        gs = GridSearchCV(
+            estimator=selected_algo,
+            param_grid=params,
+            cv=3
+        )
+
+        pipe = Pipeline(
+            steps=[
+                ("preprocessor", preprocessor),
+                ("classifier", gs)
+            ]
+        )
 
     # fit
     pipe.fit(X, y)
@@ -245,15 +260,26 @@ if __name__ == "__main__":
     logging.info(
         "Dataframe was split to X_train, X_test, y_train, y_test frames")
 
-    # train random forest
-    model = train_model(
-        algo="random_forest",
-        X=X_train,
-        y=y_train,
-        num_cols=config["numerical_columns"],
-        cat_cols=config["categorical_columns"]
-    )
-
-    logging.info(
-        "Classifier model trained")
-    logging.info("Model saved in models folder")
+    # train random forest and logistic regression
+    for i in ["logistic_regression", "random_forest"]:
+        if i in config:
+            train_model(
+                algo=i,
+                X=X_train.iloc[:1000],
+                y=y_train[:1000],
+                num_cols=config["numerical_columns"],
+                cat_cols=config["categorical_columns"],
+                params=config[i]["param_grid"]
+            )
+        else:
+            train_model(
+                algo=i,
+                X=X_train.iloc[:1000],
+                y=y_train[:1000],
+                num_cols=config["numerical_columns"],
+                cat_cols=config["categorical_columns"],
+                params=None
+            )
+        logging.info(
+            f"{i} model trained")
+        logging.info("Model saved in models folder")
