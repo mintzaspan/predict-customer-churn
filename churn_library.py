@@ -25,6 +25,7 @@ import dill
 from sklearn.metrics import classification_report, roc_auc_score, roc_curve
 from matplotlib import pyplot as plt
 import numpy as np
+import glob
 
 
 def setup_logging(script_pth):
@@ -388,16 +389,18 @@ if __name__ == "__main__":
         logging.info("Model saved in models folder")
 
     # load trained models
-    lr = load_model(model_pth="models/logistic_regression.pkl")
-    logging.info("Logistic regression model loaded")
-    rf = load_model(model_pth="models/random_forest.pkl")
-    logging.info("Random forest model loaded")
+    models_dir = glob.glob("models/*.pkl")
+    trained_models = []
+
+    for i in models_dir:
+        model = load_model(model_pth=i)
+        trained_models.append(model)
+
+    logging.info("Trained models loaded")
 
     # classification report
     build_classification_report(
-        models=[
-            lr,
-            rf],
+        models=trained_models,
         X_train=X_train,
         X_test=X_test,
         y_train=y_train,
