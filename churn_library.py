@@ -295,3 +295,9 @@ if __name__ == "__main__":
         logging.info(
             f"{i} model trained")
         logging.info("Model saved in models folder")
+
+    # load trained models
+    lr = load_model(model_pth="models/logistic_regression.pkl")
+    logging.info("Logistic regression model loaded")
+    rf = load_model(model_pth="models/random_forest.pkl")
+    logging.info("Random forest model model loaded")
