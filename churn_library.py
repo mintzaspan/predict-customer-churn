@@ -22,7 +22,9 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
 import dill
-import glob
+from sklearn.metrics import classification_report, roc_auc_score, roc_curve
+from matplotlib import pyplot as plt
+import numpy as np
 
 
 def setup_logging(script_pth):
@@ -229,6 +231,95 @@ def load_model(model_pth):
     return (model)
 
 
+def build_classification_report(models, X_train, X_test, y_train, y_test):
+    """Builds a classification report and saves as image
+
+    Args:
+        models (list) : list of models, where models are sklearn.pipe.Pipeline
+        X : predictors dataframe
+        y: response series
+
+    Returns:
+        None
+    """
+    results_dir = 'images/results/'
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir, exist_ok=True)
+
+    # confusion matrix
+    for model in models:
+        if model[1].__class__.__name__ == "GridSearchCV":
+            model_name = model[1].best_estimator_.__class__.__name__
+        else:
+            model_name = model[1].__class__.__name__
+
+        # save classification report as image
+        plt.rc('figure', figsize=(5, 5))
+        plt.text(
+            x=0.01,
+            y=1.1,
+            s=str(
+                f'{model_name} Train'),
+            fontsize=10,
+            fontproperties='monospace')
+        plt.text(
+            x=0.01,
+            y=0.6,
+            s=str(
+                classification_report(
+                    y_true=y_train,
+                    y_pred=model.predict(X_train),
+                    zero_division=np.nan)),
+            fontsize=10,
+            fontproperties='monospace')
+        plt.text(
+            x=0.01,
+            y=0.5,
+            s=str(
+                f'{model_name} Test'),
+            fontsize=10,
+            fontproperties='monospace')
+        plt.text(
+            x=0.01,
+            y=0,
+            s=str(
+                classification_report(
+                    y_true=y_test,
+                    y_pred=model.predict(X_test),
+                    zero_division=np.nan)),
+            fontsize=10,
+            fontproperties='monospace')
+        plt.axis('off')
+        plt.tight_layout()
+        plt.savefig(f'{results_dir}{model_name}_classification_report.png')
+        plt.clf()
+
+    # ROC auc
+    ls = []
+
+    for model in models:
+        if model[1].__class__.__name__ == "GridSearchCV":
+            model_name = model[1].best_estimator_.__class__.__name__
+        else:
+            model_name = model[1].__class__.__name__
+        # get auc data
+        auc = roc_auc_score(y_test, model.predict(X_test))
+        fpr, tpr, thresholds = roc_curve(
+            y_test, model.predict_proba(X_test)[:, 1])
+        ls.append([model_name, fpr, tpr, auc])
+
+    # plot AUC comparison graph
+    for i in ls:
+        plt.plot([0, 1], [0, 1], 'k--')
+        plt.plot(i[1], i[2], label='%s (ROC AUC = %0.2f)' % (i[0], i[3]))
+    plt.legend()
+    plt.xlabel("FPR")
+    plt.ylabel("TPR")
+    plt.title('Receiver Operating Characteristic')
+    plt.tight_layout()
+    plt.savefig(f'{results_dir}ROC_AUC.png')
+
+
 if __name__ == "__main__":
 
     # set up logging
@@ -300,4 +391,15 @@ if __name__ == "__main__":
     lr = load_model(model_pth="models/logistic_regression.pkl")
     logging.info("Logistic regression model loaded")
     rf = load_model(model_pth="models/random_forest.pkl")
-    logging.info("Random forest model model loaded")
+    logging.info("Random forest model loaded")
+
+    # classification report
+    build_classification_report(
+        models=[
+            lr,
+            rf],
+        X_train=X_train,
+        X_test=X_test,
+        y_train=y_train,
+        y_test=y_test)
+    logging.info("Performance reports saved in results folder")
