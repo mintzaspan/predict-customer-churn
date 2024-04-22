@@ -26,6 +26,7 @@ from sklearn.metrics import classification_report, roc_auc_score, roc_curve
 from matplotlib import pyplot as plt
 import numpy as np
 import glob
+import shap
 
 
 def setup_logging(script_pth):
@@ -180,9 +181,7 @@ def train_model(
         "logistic_regression": LogisticRegression(random_state=42),
         "decision_tree": DecisionTreeClassifier(random_state=42),
         "random_forest": RandomForestClassifier(n_jobs=-1, random_state=42),
-        "gradient_boosting": GradientBoostingClassifier(random_state=42),
-        "xgboost": XGBClassifier(seed=0),
-        "support_vector": SVC(random_state=42)
+        "gradient_boosting": GradientBoostingClassifier(random_state=42)
     }
 
     selected_algo = algo_dict[algo]
