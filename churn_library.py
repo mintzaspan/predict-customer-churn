@@ -318,6 +318,66 @@ def build_classification_report(models, X_train, X_test, y_train, y_test):
     plt.title('Receiver Operating Characteristic')
     plt.tight_layout()
     plt.savefig(f'{results_dir}ROC_AUC.png')
+    plt.clf()
+
+
+def get_feature_importances(models, X, y):
+    """Creates and saves feature importance plots for models
+
+    Args:
+        models : list of trained models (sklearn pipeline format)
+        X : X data used for training
+        y : response data used for training
+
+    Returns:
+        None
+    """
+
+    results_dir = 'images/results/'
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir, exist_ok=True)
+
+    for model in models:
+
+        X_transformed = model[0].set_output(
+            transform='pandas').fit_transform(X, y)
+
+        if model[1].__class__.__name__ == "GridSearchCV":
+            model_name = model[1].best_estimator_.__class__.__name__
+        else:
+            model_name = model[1].__class__.__name__
+
+        if model_name == 'LogisticRegression':
+            explainer = shap.LinearExplainer(
+                model=model[1], masker=X_transformed, )
+            shap_values = explainer.shap_values(X_transformed, )
+            shap.summary_plot(
+                shap_values,
+                X_transformed,
+                plot_type="bar",
+                show=False)
+            plt.title(f"{model_name} feature contribution plot")
+            plt.tight_layout()
+            plt.savefig(
+                f"{results_dir}{model_name} feature importance plot.png")
+            plt.clf()
+        else:
+            if model[1].__class__.__name__ == "GridSearchCV":
+                clf = model[1].best_estimator_
+            else:
+                clf = model[1]
+            importances = clf.feature_importances_
+            indices = np.argsort(importances)[::-1]
+            names = [X_transformed.columns[i] for i in indices]
+            plt.figure(figsize=(20, 5))
+            plt.title(f"{model_name} feature contribution plot")
+            plt.ylabel('Importance')
+            plt.bar(range(X_transformed.shape[1]), importances[indices])
+            plt.xticks(range(X_transformed.shape[1]), names, rotation=90)
+            plt.tight_layout()
+            plt.savefig(
+                f"{results_dir}{model_name} feature importance plot.png")
+            plt.clf()
 
 
 if __name__ == "__main__":
@@ -405,3 +465,10 @@ if __name__ == "__main__":
         y_train=y_train,
         y_test=y_test)
     logging.info("Performance reports saved in results folder")
+
+    # get feature importances
+    get_feature_importances(models=trained_models, X=X_train, y=y_train)
+    logging.info("Feature importance plots saved in results folder")
+
+    # end
+    logging.info("End of process")
