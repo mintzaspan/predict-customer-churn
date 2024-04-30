@@ -1,6 +1,7 @@
 import os
 import logging
-import churn_library as cls
+import pytest
+from churn_library import *
 
 logging.basicConfig(
     filename='./logs/churn_script_logging_and_tests.log',
@@ -26,3 +27,28 @@ def test_import(import_data):
         logging.error(
             "Testing import_data: The file doesn't appear to have rows and columns")
         raise err
+
+
+@pytest.fixture
+def df():
+    data = pd.DataFrame({
+        'num_col1': [1, 2, 3, 4, 5],
+        'num_col2': [5, 4, 3, 2, 1],
+        'cat_col1': ['a', 'b', 'a', 'b', 'a'],
+        'cat_col2': ['b', 'a', 'b', 'a', 'b'],
+        'target_col': [1, 0, 1, 0, 1]
+    })
+    return data
+
+
+def test_perform_eda(df):
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    target_col = 'target_col'
+    perform_eda(df, num_cols, cat_cols, target_col)
+
+    # Check if images are created
+    for col in num_cols + cat_cols:
+        assert os.path.exists(f'images/eda/{col}_histplot.png')
+        assert os.path.exists(f'images/eda/{col}_freqplot.png')
+        assert os.path.exists(f'images/eda/{col}_bv_plot.png')
