@@ -52,3 +52,11 @@ def test_perform_eda(df):
         assert os.path.exists(f'images/eda/{col}_histplot.png')
         assert os.path.exists(f'images/eda/{col}_freqplot.png')
         assert os.path.exists(f'images/eda/{col}_bv_plot.png')
+
+
+def test_split_frame(df):
+    X_train, X_test, y_train, y_test = split_frame(df, 'target_col')
+    assert X_train.shape[0] == y_train.shape[0]
+    assert X_test.shape[0] == y_test.shape[0]
+    assert X_train.shape[1] == X_test.shape[1]
+    assert X_train.shape[0] + X_test.shape[0] == df.shape[0]
