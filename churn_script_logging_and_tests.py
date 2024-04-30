@@ -60,3 +60,17 @@ def test_split_frame(df):
     assert X_test.shape[0] == y_test.shape[0]
     assert X_train.shape[1] == X_test.shape[1]
     assert X_train.shape[0] + X_test.shape[0] == df.shape[0]
+
+
+def test_train_model(df):
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    target_col = 'target_col'
+    model = train_model(df, num_cols, cat_cols, target_col)
+    assert model is not None
+    assert os.path.exists('models/model.pkl')
+
+
+def test_load_model():
+    model = load_model('models/model.pkl')
+    assert model is not None
