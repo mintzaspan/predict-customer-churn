@@ -77,3 +77,20 @@ def test_train_model(df):
 def test_load_model():
     model = load_model('models/logistic_regression.pkl')
     assert model is not None
+
+
+def test_build_classification_report(df):
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    algo = 'logistic_regression'
+    X_train, X_test, y_train, y_test = split_frame(df, 'target_col', 0.2)
+    model = train_model(algo, X_train, y_train, num_cols, cat_cols)
+    build_classification_report(
+        models=[model],
+        X_train=X_train,
+        X_test=X_test,
+        y_train=y_train,
+        y_test=y_test)
+    assert os.path.exists(
+        'images/results/LogisticRegression_classification_report.png')
+    assert os.path.exists('images/results/ROC_AUC.png')
