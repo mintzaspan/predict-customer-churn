@@ -327,7 +327,6 @@ def get_feature_importances(models, X):
     Args:
         models : list of trained models (sklearn pipeline format)
         X : X data used for training
-        y : response data used for training
 
     Returns:
         None

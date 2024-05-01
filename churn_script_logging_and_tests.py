@@ -94,3 +94,14 @@ def test_build_classification_report(df):
     assert os.path.exists(
         'images/results/LogisticRegression_classification_report.png')
     assert os.path.exists('images/results/ROC_AUC.png')
+
+
+def test_get_features_importance(df):
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    algo = 'logistic_regression'
+    X_train, X_test, y_train, y_test = split_frame(df, 'target_col', 0.2)
+    model = train_model(algo, X_train, y_train, num_cols, cat_cols)
+    get_feature_importances(models=[model], X=X_train)
+    assert os.path.exists(
+        'images/results/LogisticRegression feature importance plot.png')
