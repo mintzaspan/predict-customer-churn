@@ -340,7 +340,7 @@ def get_feature_importances(models, X, y):
     for model in models:
 
         X_transformed = model[0].set_output(
-            transform='pandas').fit_transform(X, y)
+            transform='pandas').transform(X)
 
         if model[1].__class__.__name__ == "GridSearchCV":
             model_name = model[1].best_estimator_.__class__.__name__
