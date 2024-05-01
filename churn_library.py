@@ -321,7 +321,7 @@ def build_classification_report(models, X_train, X_test, y_train, y_test):
     plt.clf()
 
 
-def get_feature_importances(models, X, y):
+def get_feature_importances(models, X):
     """Creates and saves feature importance plots for models
 
     Args:
