@@ -1,6 +1,7 @@
 import os
 import logging
 import pytest
+import tempfile
 from churn_library import *
 
 logging.basicConfig(
@@ -13,12 +14,19 @@ logging.basicConfig(
 def test_import():
     """Test the import_data function
     """
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(suffix=".csv", dir="./data", delete=False) as temp:
+        df_temp = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+        df_temp.to_csv(temp.name, index=False)
+
     try:
-        df = import_data("./data/bank_data.csv")
+        df = import_data(temp.name)
         logging.info("Testing import_data: SUCCESS")
     except FileNotFoundError as err:
         logging.error("Testing import_eda: The file wasn't found")
         raise err
+    finally:
+        os.remove(temp.name)  # Ensure the temporary file is deleted
 
     try:
         assert df.shape[0] > 0
