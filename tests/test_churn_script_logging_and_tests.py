@@ -1,6 +1,6 @@
-import pytest
+import os
 import logging
-from churn_library import import_data
+from churn_library import import_data, perform_eda
 
 
 # Set up logging
@@ -34,6 +34,20 @@ def test_import_data(data_pth):
         "Testing import_data: The file doesn't appear to have rows and columns")
     logging.info(
         "Testing import_data: SUCCESS - The file appears to have rows and columns")
+
+
+def test_perform_eda(df):
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    target_col = 'target_col'
+    perform_eda(df, num_cols, cat_cols, target_col)
+
+    # Check if images are created
+    for col in num_cols:
+        assert os.path.exists(f'images/eda/{col}_histplot.png')
+    for col in cat_cols:
+        assert os.path.exists(f'images/eda/{col}_freqplot.png')
+        assert os.path.exists(f'images/eda/{col}_bv_plot.png')
 
 
 if __name__ == "__main__":
