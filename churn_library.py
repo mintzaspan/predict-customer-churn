@@ -123,7 +123,7 @@ def split_frame(df, response, test_size):
     X = df.drop(columns=[response])
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, stratify=y, random_state=42)
+        X, y, test_size=test_size, random_state=42)
     return (X_train, X_test, y_train, y_test)
 
 
@@ -321,13 +321,12 @@ def build_classification_report(models, X_train, X_test, y_train, y_test):
     plt.clf()
 
 
-def get_feature_importances(models, X, y):
+def get_feature_importances(models, X):
     """Creates and saves feature importance plots for models
 
     Args:
         models : list of trained models (sklearn pipeline format)
         X : X data used for training
-        y : response data used for training
 
     Returns:
         None
@@ -340,7 +339,7 @@ def get_feature_importances(models, X, y):
     for model in models:
 
         X_transformed = model[0].set_output(
-            transform='pandas').fit_transform(X, y)
+            transform='pandas').transform(X)
 
         if model[1].__class__.__name__ == "GridSearchCV":
             model_name = model[1].best_estimator_.__class__.__name__
