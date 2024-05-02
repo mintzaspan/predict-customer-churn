@@ -19,8 +19,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.svm import SVC
-from xgboost import XGBClassifier
 import dill
 from sklearn.metrics import classification_report, roc_auc_score, roc_curve
 from matplotlib import pyplot as plt
@@ -466,7 +464,7 @@ if __name__ == "__main__":
     logging.info("Performance reports saved in results folder")
 
     # get feature importances
-    get_feature_importances(models=trained_models, X=X_train, y=y_train)
+    get_feature_importances(models=trained_models, X=X_train)
     logging.info("Feature importance plots saved in results folder")
 
     # end

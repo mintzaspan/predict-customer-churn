@@ -1,6 +1,8 @@
-import os
-import logging
 from churn_library import import_data, perform_eda
+import logging
+import os
+import sys
+sys.path.append(os.getcwd())
 
 
 # Set up logging
