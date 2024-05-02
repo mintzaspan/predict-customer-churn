@@ -1,7 +1,7 @@
 """
-Purpose: Build a model to predict customer churn
+Purpose: Builds a model to predict customer churn, user can build multiple models and compare them. The script requires a config.yaml file to be present in the same directory.
 Author: Panagiotis Mintzas
-Date: March 2024
+Date: May 2024
 """
 
 
