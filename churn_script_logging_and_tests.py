@@ -1,8 +1,15 @@
+"""
+Purpose: Tests the functions in the churn_library.py script and logs results.
+Author: Panagiotis Mintzas
+Date: May 2024
+"""
+
 import os
 import logging
 import pytest
 import tempfile
 from churn_library import *
+import yaml
 
 logging.basicConfig(
     filename='./logs/churn_script_logging_and_tests.log',
@@ -11,34 +18,66 @@ logging.basicConfig(
     format='%(name)s - %(levelname)s - %(message)s')
 
 
-def test_import():
-    """Test the import_data function
+def config():
     """
-    # Create a temporary CSV file
-    with tempfile.NamedTemporaryFile(suffix=".csv", dir="./data", delete=False) as temp:
-        df_temp = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-        df_temp.to_csv(temp.name, index=False)
+    Load the configuration file.
+
+    Args:
+        None
+
+    Returns:
+        config (dict): The configuration file as a dictionary.
+    """
+    with open('config.yaml', 'r') as file:
+        config = yaml.safe_load(file)
+        logging.info("Configuration file loaded")
+    return config
+
+
+@pytest.fixture(scope='module')
+def test_import(config):
+    """
+    Test the import_data function.
+
+    This function tests the import_data function by creating a temporary CSV file,
+    importing the data from the file, and performing assertions on the imported data.
+
+    Args:
+        data (str): The path to the data file.
+
+    Returns:
+        None (or error messages if the assertions fail)
+    """
 
     try:
-        df = import_data(temp.name)
+        df = import_data(config['data'])
         logging.info("Testing import_data: SUCCESS")
     except FileNotFoundError as err:
         logging.error("Testing import_eda: The file wasn't found")
         raise err
-    finally:
-        os.remove(temp.name)  # Ensure the temporary file is deleted
 
     try:
         assert df.shape[0] > 0
         assert df.shape[1] > 0
+        logging.info(
+            "Testing import_data: The file appears to have rows and columns")
     except AssertionError as err:
         logging.error(
             "Testing import_data: The file doesn't appear to have rows and columns")
         raise err
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def df():
+    """
+    Creates a sample dataframe for testing purposes.
+
+    Args:
+        None
+
+    Returns:
+        data (pd.DataFrame): A sample dataframe for running tests.
+    """
     data = pd.DataFrame({
         'num_col1': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
         'num_col2': [5, 4, 3, 2, 1, 5, 4, 3, 2, 1, 5, 4, 3, 2, 1],
@@ -50,6 +89,14 @@ def df():
 
 
 def test_perform_eda(df):
+    """
+    Test the perform_eda function.
+
+    Args:
+        df (pd.DataFrame): A sample dataframe for running tests.
+
+    Returns:
+    """
     num_cols = ['num_col1', 'num_col2']
     cat_cols = ['cat_col1', 'cat_col2']
     target_col = 'target_col'
