@@ -43,9 +43,12 @@ def test_perform_eda(df):
     # Check if images are created
     for col in num_cols:
         assert os.path.exists(f'images/eda/{col}_histplot.png')
+        os.remove(f'images/eda/{col}_histplot.png')
     for col in cat_cols:
         assert os.path.exists(f'images/eda/{col}_freqplot.png')
+        os.remove(f'images/eda/{col}_freqplot.png')
         assert os.path.exists(f'images/eda/{col}_bv_plot.png')
+        os.remove(f'images/eda/{col}_bv_plot.png')
     logging.info("Testing perform_eda: SUCCESS - The EDA images were created")
 
 
@@ -110,6 +113,7 @@ def test_train_model(df, config):
         raise err
 
     assert os.path.exists(f'models/{algo}.pkl')
+    os.remove(f'models/{algo}.pkl')
     logging.info("Testing train_model: SUCCESS - Model was saved successfully")
 
     other_algo = "logistic_regression"
@@ -128,6 +132,7 @@ def test_train_model(df, config):
         raise err
 
     assert os.path.exists(f'models/{other_algo}.pkl')
+    os.remove(f'models/{other_algo}.pkl')
     logging.info("Testing train_model: SUCCESS - Model was saved successfully")
 
 
@@ -162,6 +167,7 @@ def test_load_model(df):
         raise err
 
     assert model is not None
+    os.remove(f'models/{algo}.pkl')
     logging.info("Testing load_model: SUCCESS - Model type is not None")
 
 
@@ -188,13 +194,16 @@ def test_build_classification_report(df):
         cat_cols=cat_cols)
 
     model = load_model(f"models/{algo}.pkl")
+    os.remove(f'models/{algo}.pkl')
     try:
         build_classification_report([model], X_train, X_test, y_train, y_test)
         assert os.path.exists(
             f'images/results/LogisticRegression_classification_report.png')
+        os.remove(f'images/results/LogisticRegression_classification_report.png')
         logging.info(
             "Testing build_classification_report: SUCCESS - Classification report was built successfully")
         assert os.path.exists('images/results/ROC_AUC.png')
+        os.remove('images/results/ROC_AUC.png')
         logging.info(
             "Testing build_classification_report: SUCCESS - ROC_AUC curve was built successfully")
     except Exception as err:
@@ -226,9 +235,12 @@ def test_get_feature_importances(df):
         cat_cols=cat_cols)
 
     model = load_model(f"models/{algo}.pkl")
+    os.remove(f'models/{algo}.pkl')
     try:
         get_feature_importances([model], X_train)
         assert os.path.exists(
+            f'images/results/LogisticRegression feature importance plot.png')
+        os.remove(
             f'images/results/LogisticRegression feature importance plot.png')
         logging.info(
             "Testing get_feature_importances: SUCCESS - Feature importances were built successfully")
