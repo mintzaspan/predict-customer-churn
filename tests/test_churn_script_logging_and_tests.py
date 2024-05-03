@@ -1,4 +1,4 @@
-from churn_library import import_data, perform_eda, split_frame
+from churn_library import import_data, perform_eda, split_frame, train_model
 import logging
 import os
 
@@ -71,6 +71,39 @@ def test_split_frame(df, target_col='target_col', test_size=0.2):
     assert y_test.shape[0] == X_test.shape[0]
     assert X_train.shape[0] + X_test.shape[0] == df.shape[0]
     assert y_train.shape[0] + y_test.shape[0] == df.shape[0]
+
+
+def test_train_model(df, config):
+    """Test the train_model function.
+
+    Args:
+        df (pd.DataFrame): The dataframe to split and train the model on.
+
+    Returns:
+        None
+    """
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    target_col = 'target_col'
+    algo = 'random_forest'
+    X_train, X_test, y_train, y_test = split_frame(
+        df, target_col, test_size=0.2)
+    train_model(
+        algo=algo,
+        X=X_train,
+        y=y_train,
+        num_cols=num_cols,
+        cat_cols=cat_cols,
+        params=config['random_forest']['param_grid'])
+    assert os.path.exists(f'models/{algo}.pkl')
+    other_algo = "logistic_regression"
+    train_model(
+        algo=other_algo,
+        X=X_train,
+        y=y_train,
+        num_cols=num_cols,
+        cat_cols=cat_cols)
+    assert os.path.exists(f'models/{other_algo}.pkl')
 
 
 if __name__ == "__main__":

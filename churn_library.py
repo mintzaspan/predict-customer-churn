@@ -141,6 +141,7 @@ def train_model(
         y: response
         num_cols: list of numerical type columns in X
         cat_cols: list of categorical type columns in X
+        params: hyperparameters for GridSearchCV
 
     Returns:
         pipe : binary classification pipeline
