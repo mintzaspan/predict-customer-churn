@@ -386,8 +386,8 @@ if __name__ == "__main__":
         if i in config:
             train_model(
                 algo=i,
-                X=X_train.iloc[:1000],
-                y=y_train[:1000],
+                X=X_train,
+                y=y_train,
                 num_cols=config["numerical_columns"],
                 cat_cols=config["categorical_columns"],
                 params=config[i]["param_grid"]
@@ -395,8 +395,8 @@ if __name__ == "__main__":
         else:
             train_model(
                 algo=i,
-                X=X_train.iloc[:1000],
-                y=y_train[:1000],
+                X=X_train,
+                y=y_train,
                 num_cols=config["numerical_columns"],
                 cat_cols=config["categorical_columns"],
                 params=None

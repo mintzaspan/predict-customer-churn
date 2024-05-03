@@ -14,4 +14,4 @@ pre-commit install
 pytest
 
 # run churn module
-python scripts/churn_library.py
+python src/churn_library.py
