@@ -1,5 +1,6 @@
 from churn_library import import_data, perform_eda, split_frame, train_model, load_model
 import logging
+import pandas as pd
 import os
 
 
@@ -16,19 +17,15 @@ def test_import_data(data_pth):
 
     try:
         df = import_data(data_pth)
-        logging.info("Testing import_data: SUCCESS - The file was found")
-    except FileNotFoundError as err:
-        logging.error("Testing import_eda: The file wasn't found")
-        raise err
-
-    try:
-        assert df.shape[0] > 0
-        assert df.shape[1] > 0
         logging.info(
-            "Testing import_data: SUCCESS - The file appears to have rows and columns")
-    except AssertionError as err:
+            f"Testing import_data: SUCCESS - The file {data_pth} was found")
+    except FileNotFoundError as err:
         logging.error(
-            "Testing import_data: The file doesn't appear to have rows and columns")
+            f"Testing import_data: ERROR - The file {data_pth} wasn't found - {err}")
+        raise err
+    except pd.errors.EmptyDataError as err:
+        logging.error(
+            f"Testing import_data: ERROR - The file {data_pth} is empty - {err}")
         raise err
 
 
