@@ -121,7 +121,7 @@ def split_frame(df, response, test_size):
     X = df.drop(columns=[response])
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=42)
+        X, y, test_size=test_size, stratify=y, random_state=42)
     return (X_train, X_test, y_train, y_test)
 
 

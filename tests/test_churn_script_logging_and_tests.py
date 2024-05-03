@@ -1,8 +1,6 @@
-from churn_library import import_data, perform_eda
+from churn_library import import_data, perform_eda, split_frame
 import logging
 import os
-import sys
-sys.path.append(os.getcwd())
 
 
 # Set up logging
@@ -50,6 +48,29 @@ def test_perform_eda(df):
     for col in cat_cols:
         assert os.path.exists(f'images/eda/{col}_freqplot.png')
         assert os.path.exists(f'images/eda/{col}_bv_plot.png')
+
+
+def test_split_frame(df, target_col='target_col', test_size=0.2):
+    """Test the split_frame function.
+
+    Args:
+        df (pd.DataFrame): The dataframe to split.
+
+    Returns:
+        None
+    """
+    X_train, X_test, y_train, y_test = split_frame(
+        df, target_col, test_size)
+    assert X_train.shape[0] > 0
+    assert X_train.shape[1] > 0
+    assert X_test.shape[0] > 0
+    assert X_test.shape[1] > 0
+    assert y_train.shape[0] > 0
+    assert y_test.shape[0] > 0
+    assert y_train.shape[0] == X_train.shape[0]
+    assert y_test.shape[0] == X_test.shape[0]
+    assert X_train.shape[0] + X_test.shape[0] == df.shape[0]
+    assert y_train.shape[0] + y_test.shape[0] == df.shape[0]
 
 
 if __name__ == "__main__":
