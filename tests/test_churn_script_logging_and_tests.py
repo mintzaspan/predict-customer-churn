@@ -1,4 +1,4 @@
-from churn_library import import_data, perform_eda, split_frame, train_model
+from churn_library import import_data, perform_eda, split_frame, train_model, load_model
 import logging
 import os
 
@@ -104,6 +104,31 @@ def test_train_model(df, config):
         num_cols=num_cols,
         cat_cols=cat_cols)
     assert os.path.exists(f'models/{other_algo}.pkl')
+
+
+def test_load_model(df):
+    """Test the load_model function.
+
+    Args:
+        df (pd.DataFrame): The dataframe to split and train the model on.
+
+    Returns:
+        None
+    """
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    target_col = 'target_col'
+    algo = 'logistic_regression'
+    X_train, X_test, y_train, y_test = split_frame(
+        df, target_col, test_size=0.2)
+    train_model(
+        algo=algo,
+        X=X_train,
+        y=y_train,
+        num_cols=num_cols,
+        cat_cols=cat_cols)
+    model = load_model(f"models/{algo}.pkl")
+    assert model is not None
 
 
 if __name__ == "__main__":
