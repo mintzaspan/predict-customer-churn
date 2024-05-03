@@ -1,4 +1,4 @@
-from churn_library import import_data, perform_eda, split_frame, train_model, load_model, build_classification_report, get_feature_importances
+from src.churn_library import import_data, perform_eda, split_frame, train_model, load_model, build_classification_report, get_feature_importances
 import logging
 import pandas as pd
 import os
