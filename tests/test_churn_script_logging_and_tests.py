@@ -1,4 +1,4 @@
-from churn_library import import_data, perform_eda, split_frame, train_model, load_model, build_classification_report
+from churn_library import import_data, perform_eda, split_frame, train_model, load_model, build_classification_report, get_feature_importances
 import logging
 import pandas as pd
 import os
@@ -201,6 +201,41 @@ def test_build_classification_report(df):
     except Exception as err:
         logging.error(
             "Testing build_classification_report: Classification report not completed")
+        raise err
+
+
+def test_get_feature_importances(df):
+    """Test the get_feature_importances function.
+
+    Args:
+        df (pd.DataFrame): The dataframe to train the model on and produce the feature importances.
+
+    Returns:
+        None
+    """
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    target_col = 'target_col'
+    algo = 'logistic_regression'
+    X_train, X_test, y_train, y_test = split_frame(
+        df, target_col, test_size=0.2)
+    train_model(
+        algo=algo,
+        X=X_train,
+        y=y_train,
+        num_cols=num_cols,
+        cat_cols=cat_cols)
+
+    model = load_model(f"models/{algo}.pkl")
+    try:
+        get_feature_importances([model], X_train)
+        assert os.path.exists(
+            f'images/results/LogisticRegression feature importance plot.png')
+        logging.info(
+            "Testing get_feature_importances: SUCCESS - Feature importances were built successfully")
+    except Exception as err:
+        logging.error(
+            "Testing get_feature_importances: Feature importances not completed")
         raise err
 
 
