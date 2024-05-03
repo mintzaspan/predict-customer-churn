@@ -7,7 +7,6 @@ Date: March 2024
 
 # import libraries
 import os
-import logging
 import yaml
 import pandas as pd
 import plotly.express as px
@@ -25,32 +24,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import glob
 import shap
-
-
-def setup_logging(script_pth):
-    """Sets up logging for the current module named after the module
-
-    Args:
-        script_pth: path to a python module
-
-    Returns:
-        None
-    """
-
-    log_dir = 'logs/'
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir, exist_ok=True)
-
-    script_path = script_pth
-    script_name = os.path.basename(script_path).split('/')[-1].split('.')[0]
-    log_name = ''.join([script_name, '.log'])
-    log_file = os.path.join(log_dir, log_name)
-
-    logging.basicConfig(
-        filename=log_file,
-        level=logging.INFO,
-        filemode='w',
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 def import_data(pth):
@@ -380,46 +353,33 @@ def get_feature_importances(models, X):
 
 if __name__ == "__main__":
 
-    # set up logging
-    setup_logging('churn_library.py')
-    logging.info("Log file created")
-
     # read config file
     with open('config.yaml', 'r') as file:
         config = yaml.safe_load(file)
-    logging.info("Training parameters imported")
 
     # import data
     try:
-        logging.info('Reading CSV file')
         df = import_data(config['data'])
-        logging.info('SUCCESS: File read into dataframe')
-    except FileNotFoundError:
-        logging.error('File was not found in specified directory')
+    except FileNotFoundError as err:
+        raise err
 
     # define churn variable
     df['Churn'] = df['Attrition_Flag'].apply(
         lambda val: 0 if val == "Existing Customer" else 1)
-    logging.info('Churn variable created')
 
     # drop columns
     df.drop(columns=config['drop_columns'], inplace=True)
-    logging.info(f"Dropped obsolete columns dropped: {config['drop_columns']}")
 
     # eda
-    logging.info('Starting exploratory data analysis')
     perform_eda(
         df=df,
         num_cols=config["numerical_columns"],
         cat_cols=config["categorical_columns"],
         target_col=config["response"])
-    logging.info('Univariate and bivariate analysis plots saved in EDA folder')
 
     # split to train test
     X_train, X_test, y_train, y_test = split_frame(
         df=df, response=config["response"], test_size=config["feature_engineering"]["test_size"])
-    logging.info(
-        "Dataframe was split to X_train, X_test, y_train, y_test frames")
 
     # train random forest and logistic regression
     for i in ["logistic_regression", "random_forest"]:
@@ -441,9 +401,6 @@ if __name__ == "__main__":
                 cat_cols=config["categorical_columns"],
                 params=None
             )
-        logging.info(
-            f"{i} model trained")
-        logging.info("Model saved in models folder")
 
     # load trained models
     models_dir = glob.glob("models/*.pkl")
@@ -453,8 +410,6 @@ if __name__ == "__main__":
         model = load_model(model_pth=i)
         trained_models.append(model)
 
-    logging.info("Trained models loaded")
-
     # classification report
     build_classification_report(
         models=trained_models,
@@ -462,11 +417,6 @@ if __name__ == "__main__":
         X_test=X_test,
         y_train=y_train,
         y_test=y_test)
-    logging.info("Performance reports saved in results folder")
 
     # get feature importances
     get_feature_importances(models=trained_models, X=X_train)
-    logging.info("Feature importance plots saved in results folder")
-
-    # end
-    logging.info("End of process")
