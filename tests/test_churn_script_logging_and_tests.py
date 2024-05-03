@@ -195,9 +195,12 @@ def test_build_classification_report(df):
             f'images/results/LogisticRegression_classification_report.png')
         logging.info(
             "Testing build_classification_report: SUCCESS - Classification report was built successfully")
+        assert os.path.exists('images/results/ROC_AUC.png')
+        logging.info(
+            "Testing build_classification_report: SUCCESS - ROC_AUC curve was built successfully")
     except Exception as err:
         logging.error(
-            "Testing build_classification_report: Classification report wasn't built")
+            "Testing build_classification_report: Classification report not completed")
         raise err
 
 
