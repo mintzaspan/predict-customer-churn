@@ -14,7 +14,7 @@ def config():
         dict: The contents of the config.yaml file as a dictionary.
 
     """
-    with open("config.yaml", "r") as f:
+    with open("src/config.yaml", "r") as f:
         return yaml.safe_load(f)
 
 

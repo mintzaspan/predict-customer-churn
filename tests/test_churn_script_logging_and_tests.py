@@ -2,7 +2,6 @@ from src.churn_library import import_data, perform_eda, split_frame, train_model
 import logging
 import pandas as pd
 import os
-import glob
 
 
 def test_import_data(data_pth):
