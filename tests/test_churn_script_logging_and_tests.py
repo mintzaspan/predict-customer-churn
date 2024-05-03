@@ -1,7 +1,8 @@
-from churn_library import import_data, perform_eda, split_frame, train_model, load_model
+from churn_library import import_data, perform_eda, split_frame, train_model, load_model, build_classification_report
 import logging
 import pandas as pd
 import os
+import glob
 
 
 def test_import_data(data_pth):
@@ -163,6 +164,41 @@ def test_load_model(df):
 
     assert model is not None
     logging.info("Testing load_model: SUCCESS - Model type is not None")
+
+
+def test_build_classification_report(df):
+    """Test the build_classification_report function.
+
+    Args:
+        df (pd.DataFrame): The dataframe to train the model on and produce the report.
+
+    Returns:
+        None
+    """
+    num_cols = ['num_col1', 'num_col2']
+    cat_cols = ['cat_col1', 'cat_col2']
+    target_col = 'target_col'
+    algo = 'logistic_regression'
+    X_train, X_test, y_train, y_test = split_frame(
+        df, target_col, test_size=0.2)
+    train_model(
+        algo=algo,
+        X=X_train,
+        y=y_train,
+        num_cols=num_cols,
+        cat_cols=cat_cols)
+
+    model = load_model(f"models/{algo}.pkl")
+    try:
+        build_classification_report([model], X_train, X_test, y_train, y_test)
+        assert os.path.exists(
+            f'images/results/LogisticRegression_classification_report.png')
+        logging.info(
+            "Testing build_classification_report: SUCCESS - Classification report was built successfully")
+    except Exception as err:
+        logging.error(
+            "Testing build_classification_report: Classification report wasn't built")
+        raise err
 
 
 if __name__ == "__main__":

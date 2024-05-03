@@ -179,6 +179,7 @@ def train_model(
     )
 
     pipe.fit(X, y)
+    print(type(pipe))
 
     # save to local folder
     with open(f'{models_dir}{algo}.pkl', 'wb') as f:
@@ -200,6 +201,7 @@ def load_model(model_pth):
     with open(model_pth, 'rb') as file:
         model = dill.load(file)
 
+    print(type(model))
     return (model)
 
 
@@ -220,6 +222,7 @@ def build_classification_report(models, X_train, X_test, y_train, y_test):
 
     # confusion matrix
     for model in models:
+        print(type(model))
         if model[1].__class__.__name__ == "GridSearchCV":
             model_name = model[1].best_estimator_.__class__.__name__
         else:
